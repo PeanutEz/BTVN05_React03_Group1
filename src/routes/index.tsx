@@ -1,16 +1,30 @@
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import UserManagerPage from '../pages/UserManagerPage';
-import NotFoundPage from '../pages/NotFoundPage';
-import { Routes, Route } from 'react-router-dom';
+import ProtectedRoute from '../components/ProtectedRoute';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/admin/users" element={<UserManagerPage />} />
-      <Route path="*" element={<NotFoundPage />} />
+      <Route 
+        path="/" 
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/users" 
+        element={
+          <ProtectedRoute>
+            <UserManagerPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
