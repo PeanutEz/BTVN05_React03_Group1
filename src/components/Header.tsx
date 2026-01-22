@@ -130,10 +130,40 @@ export default function Header() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                   e.currentTarget.style.color = 'var(--text-primary)';
-                }}
-              >
+                }}              >
                 👤 Hồ sơ cá nhân
               </button>
+
+              {/* Admin Menu Item - Only show if user is Admin */}
+              {user?.role === 'Admin' && (
+                <button
+                  onClick={() => {
+                    navigate('/admin/users');
+                    setShowMenu(false);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-md) var(--space-lg)',
+                    border: 'none',
+                    background: 'transparent',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    color: 'var(--text-primary)',
+                    transition: 'var(--transition-fast)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 149, 0, 0.1)';
+                    e.currentTarget.style.color = '#ff9500';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
+                >
+                  👑 Quản lý Admin
+                </button>
+              )}
               
               <div style={{ height: '1px', background: 'var(--border-light)', margin: 'var(--space-sm) 0' }} />
               

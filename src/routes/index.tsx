@@ -1,6 +1,7 @@
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import UserManagerPage from '../pages/UserManagerPage';
+import ProfilePage from '../pages/Profilepage';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -13,6 +14,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <HomePage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         } 
       />
