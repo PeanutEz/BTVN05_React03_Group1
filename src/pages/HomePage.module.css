@@ -1,0 +1,30 @@
+/* HomePage Styles - Tech Green Theme */
+.container {
+  background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-tertiary) 100%);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Animated tech background */
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(45deg, transparent 24%, rgba(0, 208, 132, 0.05) 25%, rgba(0, 208, 132, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 208, 132, 0.05) 75%, rgba(0, 208, 132, 0.05) 76%, transparent 77%, transparent),
+    linear-gradient(-45deg, transparent 24%, rgba(0, 102, 255, 0.05) 25%, rgba(0, 102, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 102, 255, 0.05) 75%, rgba(0, 102, 255, 0.05) 76%, transparent 77%, transparent);
+  background-size: 30px 30px;
+  animation: techMove 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes techMove {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-10px, -10px); }
+  50% { transform: translate(10px, 10px); }
+  75% { transform: translate(-5px, 5px); }
+}

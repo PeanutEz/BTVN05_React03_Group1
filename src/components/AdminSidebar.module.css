@@ -1,0 +1,242 @@
+/* AdminSidebar Styles - Tech Green Theme */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 80px; /* Below header */
+  bottom: 0;
+  width: 70px;
+  background: var(--background-secondary);
+  border-right: 2px solid var(--border-light);
+  box-shadow: var(--shadow-medium);
+  transition: width var(--transition-normal), box-shadow var(--transition-normal);
+  z-index: 100;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar:hover {
+  box-shadow: var(--shadow-heavy);
+}
+
+.sidebar.expanded {
+  width: 280px;
+}
+
+.sidebarContent {
+  padding: var(--space-lg) 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content when collapsed */
+  transition: align-items var(--transition-normal);
+  padding-top: var(--space-xl); /* Add top padding since no logo */
+}
+
+.sidebar.expanded .sidebarContent {
+  align-items: stretch; /* Full width when expanded */
+}
+
+/* Remove logo styles since logo is removed */
+
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: 0;
+  width: 100%;
+  align-items: center; /* Center navigation items when collapsed */
+  justify-content: flex-start;
+  transition: align-items var(--transition-normal);
+}
+
+.sidebar.expanded .nav {
+  align-items: stretch; /* Full width when expanded */
+  padding: 0 var(--space-md);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Perfect center when collapsed */
+  gap: var(--space-md);
+  padding: var(--space-sm);
+  margin: 0; /* Reset margin */
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: visible;
+  text-align: center; /* Center text */
+  color: var(--text-primary);
+  width: 54px; /* Fixed width for collapsed state */
+  height: 54px; /* Fixed height for perfect square */
+  min-width: 54px;
+  min-height: 54px;
+}
+
+.sidebar.expanded .menuItem {
+  justify-content: flex-start; /* Align left when expanded */
+  width: 100%; /* Full width when expanded */
+  height: auto; /* Auto height when expanded */
+  padding: var(--space-lg);
+  overflow: hidden; /* Hide overflow when expanded */
+  text-align: left; /* Left align text when expanded */
+  min-width: unset;
+}
+
+.menuItem:hover:not(.active):not(:disabled) {
+  background: var(--primary-green-ultra-light);
+  color: var(--primary-green);
+  transform: scale(1.05); /* Scale effect for collapsed state */
+  box-shadow: 0 4px 12px rgba(0, 208, 132, 0.15);
+}
+
+.sidebar.expanded .menuItem:hover:not(.active):not(:disabled) {
+  transform: translateX(4px) scale(1.02); /* Slide effect for expanded state */
+}
+
+.menuItem.active {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+  color: var(--text-white);
+  box-shadow: 0 4px 16px rgba(0, 208, 132, 0.3);
+  transform: none; /* No transform for active items */
+}
+
+.menuItem.active:hover {
+  transform: none; /* No hover effect for active items */
+}
+
+.menuItem:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: var(--text-muted);
+}
+
+/* Remove active item border indicator */
+
+.menuIcon {
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  display: flex !important; /* Force display */
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  flex-shrink: 0; /* Prevent icon from shrinking */
+  visibility: visible !important; /* Force visibility */
+}
+
+.sidebar.expanded .menuIcon {
+  width: auto; /* Auto width when expanded */
+  margin-right: var(--space-sm); /* Add margin when expanded */
+}
+
+.menuIcon:hover {
+  transform: rotate(5deg);
+}
+
+/* Active state for icons */
+.menuItem.active .menuIcon {
+  color: var(--text-white);
+  transform: none;
+}
+
+.menuItem.active .menuIcon:hover {
+  transform: none; /* No hover effect for active icons */
+}
+
+.menuLabel {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity var(--transition-normal), transform var(--transition-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0;
+}
+
+.sidebar.expanded .menuLabel {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.1s;
+  width: auto;
+}
+
+.menuItem.active .menuLabel {
+  color: var(--text-white);
+}
+
+.menuItem:disabled .menuLabel {
+  color: var(--text-muted);
+}
+
+/* Tooltip for collapsed state */
+.sidebar:not(.expanded) .menuItem:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + var(--space-md));
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--background-primary);
+  color: var(--text-primary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--border-light);
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  animation: tooltipFadeIn 0.3s ease-out 0.5s forwards; /* Delay tooltip appearance */
+  pointer-events: none;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  
+  .sidebar.expanded {
+    width: 240px;
+  }
+  
+  .menuIcon {
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .menuItem {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+  }
+  
+  .sidebar.expanded .menuItem {
+    padding: var(--space-md);
+    min-width: unset;
+  }
+}

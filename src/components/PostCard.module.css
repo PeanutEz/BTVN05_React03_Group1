@@ -1,0 +1,203 @@
+/* PostCard Styles - Tech Green Theme */
+.postCard {
+  background: var(--background-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-light);
+  margin-bottom: var(--space-xl);
+  overflow: hidden;
+  transition: var(--transition-normal);
+  border: 1px solid var(--border-light);
+}
+
+.postCard:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-4px);
+  border-color: var(--primary-green-light);
+}
+
+.header {
+  padding: var(--space-xl) var(--space-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  background: linear-gradient(135deg, var(--background-secondary) 0%, var(--primary-green-ultra-light) 100%);
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  border: 3px solid var(--primary-green-light);
+  box-shadow: var(--shadow-light);
+  transition: var(--transition-fast);
+}
+
+.avatar:hover {
+  transform: scale(1.1);
+  border-color: var(--primary-green);
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: var(--space-xs);
+}
+
+.timeInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.timeAgo {
+  font-size: 14px;
+  color: var(--text-muted);  line-height: 1.4;
+}
+
+.moreButton {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 18px;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.moreButton:hover {
+  background: var(--primary-green-ultra-light);
+  color: var(--primary-green);
+  transform: scale(1.1);
+}
+
+.content {
+  padding: 0 var(--space-2xl) var(--space-xl);
+}
+
+.title {
+  margin: 0 0 var(--space-md) 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-green-dark) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.7;  letter-spacing: 0.2px;
+}
+
+.mediaContainer {
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 460px;
+  object-fit: cover;
+  display: block;
+  transition: var(--transition-slow);
+}
+
+.image:hover {
+  transform: scale(1.02);
+}
+
+.video {
+  width: 100%;
+  height: 460px;
+  object-fit: cover;
+  display: block;
+  background: var(--background-tertiary);
+}
+
+.video:focus {
+  outline: 2px solid var(--primary-green);
+  outline-offset: 2px;
+}
+
+.actionBar {
+  padding: var(--space-lg) var(--space-2xl);
+  border-top: 1px solid var(--border-light);
+  background: linear-gradient(135deg, var(--background-secondary) 0%, var(--background-tertiary) 100%);
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+  flex: 1;
+  border: 1px solid var(--border-light);
+}
+
+.actionButton:hover {
+  background: var(--primary-green-ultra-light);
+  color: var(--primary-green);
+  border-color: var(--primary-green-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+.actionButton:active {
+  transform: translateY(0);
+}
+
+.actionIcon {
+  font-size: 18px;
+  transition: var(--transition-fast);
+}
+
+.actionButton:hover .actionIcon {
+  transform: scale(1.2);
+}
+
+/* Tech animation */
+@keyframes techGlow {
+  0%, 100% { 
+    box-shadow: 0 0 5px var(--primary-green-light);
+  }
+  50% { 
+    box-shadow: 0 0 20px var(--primary-green), 0 0 30px var(--primary-green-light);
+  }
+}
+
+.postCard:focus-within {
+  animation: techGlow 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

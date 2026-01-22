@@ -1,12 +1,32 @@
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
+import AdminSidebar from '../components/AdminSidebar';
 import { userService } from '../services/user.service';
 import type { User } from '../types/user.type';
+import styles from './UserManagerPage.module.css';
 
-export default function UserManagerPage() {
-  const [users, setUsers] = useState<User[]>([]);
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  } catch (error) {
+    return 'Invalid Date';
+  }
+};
+
+// Generate avatar từ tên nếu không có avatar từ user data
+const generateAvatarUrl = (name: string) => {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00d084&color=fff&size=64`;
+};
+
+export default function UserManagerPage() {  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -30,95 +50,91 @@ export default function UserManagerPage() {
     alert(`Xem chi tiết user:\nTên: ${user.name}\nEmail: ${user.email}\nRole: ${user.role}`);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
+  const handleEdit = (user: User) => {
+    alert(`Chỉnh sửa user: ${user.name}`);
   };
 
+  const handleDelete = (user: User) => {
+    if (confirm(`Bạn có chắc muốn xóa user ${user.name}?`)) {
+      alert(`Đã xóa user: ${user.name}`);
+    }  };
+
   return (
-    <div>
+    <div className={styles.container}>
       <Header />
-      <div style={{ padding: '30px' }}>
-        <h1 style={{ marginBottom: '20px' }}>User Management</h1>
+      <AdminSidebar onExpandedChange={setSidebarExpanded} />
+      <div className={`${styles.content} ${sidebarExpanded ? styles.expanded : ''}`}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>
+            <span className={styles.titleIcon}>👥</span>
+            User Management
+          </h1>
+          <p className={styles.subtitle}>Manage and monitor user accounts</p>        </div>
+
+        {loading && (
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+          </div>
+        )}
         
-        {loading && <p>Đang tải...</p>}
-        
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>⚠️</div>
+            <p className={styles.emptyText}>{error}</p>
+          </div>
+        )}
         
         {!loading && !error && (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              backgroundColor: 'white',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              borderRadius: '8px'
-            }}>
-              <thead>
-                <tr style={{ backgroundColor: '#007bff', color: 'white' }}>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #0056b3' }}>ID</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #0056b3' }}>Name</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #0056b3' }}>Email</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #0056b3' }}>Role</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #0056b3' }}>Create Date</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #0056b3' }}>Update Date</th>
-                  <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid #0056b3' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user, index) => (
-                  <tr 
-                    key={user.id}
-                    style={{ 
-                      backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'white',
-                      borderBottom: '1px solid #dee2e6'
-                    }}
-                  >
-                    <td style={{ padding: '12px' }}>{user.id}</td>
-                    <td style={{ padding: '12px' }}>{user.name}</td>
-                    <td style={{ padding: '12px' }}>{user.email}</td>
-                    <td style={{ padding: '12px' }}>
-                      <span style={{
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        backgroundColor: user.role === 'Admin' ? '#28a745' : '#17a2b8',
-                        color: 'white',
-                        fontSize: '12px',
-                        fontWeight: 'bold'
-                      }}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px' }}>{formatDate(user.createDate)}</td>
-                    <td style={{ padding: '12px' }}>{user.updateDate ? formatDate(user.updateDate) : '-'}</td>
-                    <td style={{ padding: '12px', textAlign: 'center' }}>
-                      <button
-                        onClick={() => handleView(user)}
-                        style={{
-                          padding: '6px 16px',
-                          backgroundColor: '#007bff',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '14px'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            
-            {users.length === 0 && (
-              <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                Không có người dùng nào
-              </p>
-            )}
-          </div>
+          <>
+            <div className={styles.userGrid}>              {users.map((user) => (
+                <div key={user.id} className={styles.userCard}>
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className={styles.userAvatar}
+                      onError={(e) => {
+                        // Fallback to generated avatar if user avatar fails to load
+                        e.currentTarget.src = generateAvatarUrl(user.name);
+                      }}
+                    />
+                  ) : (
+                    <div className={styles.userAvatar}>
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className={styles.userName}>{user.name}</div>
+                  <div className={styles.userEmail}>{user.email}</div>
+                  <div className={`${styles.userRole} ${user.role === 'Admin' ? styles.roleAdmin : styles.roleUser}`}>
+                    {user.role}
+                  </div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                    <div>Created: {formatDate(user.createDate)}</div>
+                    {user.updateDate && <div>Updated: {formatDate(user.updateDate)}</div>}
+                  </div>
+                  <div className={styles.userActions}>
+                    <button
+                      onClick={() => handleView(user)}
+                      className={styles.actionButton}
+                    >
+                      👁️ View
+                    </button>
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className={`${styles.actionButton} ${styles.editButton}`}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user)}
+                      className={`${styles.actionButton} ${styles.deleteButton}`}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

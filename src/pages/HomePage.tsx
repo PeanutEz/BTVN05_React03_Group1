@@ -1,13 +1,12 @@
 import Header from '../components/Header';
+import PostList from '../components/PostList';
+import styles from './HomePage.module.css';
 
 export default function HomePage() {
   return (
-    <div>
+    <div className={styles.container}>
       <Header />
-      <div style={{ padding: '30px' }}>
-        <h1>User Home Page</h1>
-        <p>Welcome to user area</p>
-      </div>
+      <PostList />
     </div>
   );
 }

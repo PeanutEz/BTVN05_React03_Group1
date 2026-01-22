@@ -3,11 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth.service';
 import styles from './Header.module.css';
 
-// Generate avatar từ tên nếu không có avatar từ user data
-const generateAvatarUrl = (name: string) => {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00d084&color=fff&size=32`;
-};
-
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -24,53 +19,49 @@ export default function Header() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
   const handleLogout = () => {
     authService.logout();
     navigate('/login');
   };
 
-  const handleLogoClick = () => {
-    navigate('/');
-  };
-
   return (
     <header className={styles.header}>
       <nav className={styles.nav}>
-        <div className={styles.logo} onClick={handleLogoClick}>
+        <div className={styles.logo}>
           <div className={styles.logoText}>
             🚀 TechFeed
           </div>
-        </div>        <div className={styles.navItems}>
-          {/* Navigation items removed - keeping space for future use */}
         </div>
 
-        <div className={styles.userMenu} ref={menuRef}>          <button
+        <div className={styles.navItems}>
+          <a href="#" className={`${styles.navLink} ${styles.active}`}>
+            Trang chủ
+          </a>
+          <a href="#" className={styles.navLink}>
+            Khám phá
+          </a>
+          <a href="#" className={styles.navLink}>
+            Thông báo
+          </a>
+        </div>
+
+        <div className={styles.userMenu} ref={menuRef}>
+          <button
             onClick={() => setShowMenu(!showMenu)}
             className={styles.userButton}
           >
-            {user?.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className={styles.userAvatar}
-                onError={(e) => {
-                  // Fallback to generated avatar if user avatar fails to load
-                  e.currentTarget.src = generateAvatarUrl(user?.name || 'User');
-                }}
-              />
-            ) : (
-              <div className={styles.userAvatar} style={{
-                background: 'linear-gradient(135deg, #00d084 0%, #0066ff 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: '600',
-                fontSize: '14px'
-              }}>
-                {user?.name?.charAt(0).toUpperCase() || 'U'}
-              </div>
-            )}
+            <div className={styles.userAvatar} style={{
+              background: 'linear-gradient(135deg, #00d084 0%, #0066ff 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '600',
+              fontSize: '14px'
+            }}>
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
             <span>{user?.name || 'User'}</span>
             <span style={{ 
               fontSize: '12px',
@@ -107,7 +98,8 @@ export default function Header() {
                   {user?.email || 'user@example.com'}
                 </div>
               </div>
-                <button
+              
+              <button
                 onClick={() => {
                   navigate('/profile');
                   setShowMenu(false);
@@ -133,6 +125,34 @@ export default function Header() {
                 }}
               >
                 👤 Hồ sơ cá nhân
+              </button>
+              
+              <button
+                onClick={() => {
+                  navigate('/settings');
+                  setShowMenu(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-md) var(--space-lg)',
+                  border: 'none',
+                  background: 'transparent',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  color: 'var(--text-primary)',
+                  transition: 'var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--primary-green-ultra-light)';
+                  e.currentTarget.style.color = 'var(--primary-green)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                }}
+              >
+                ⚙️ Cài đặt
               </button>
               
               <div style={{ height: '1px', background: 'var(--border-light)', margin: 'var(--space-sm) 0' }} />

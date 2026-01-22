@@ -5,7 +5,8 @@ export interface User {
     password?: string,
     createDate: string,
     updateDate?: string,
-    role: string
+    role: string,
+    avatar?: string
 }
 
 export interface LoginRequest {
