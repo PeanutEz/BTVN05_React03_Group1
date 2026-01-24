@@ -30,6 +30,15 @@ export default function UserManagerPage() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: '',
+    avatar: ''
+  });
   const normalizeText = (text: string) =>
     text
       .toLowerCase()
@@ -65,7 +74,59 @@ export default function UserManagerPage() {
   };
 
   const handleEdit = (user: User) => {
-    alert(`Chỉnh sửa user: ${user.name}`);
+    setEditingUser(user);
+    setFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingUser(null);
+    setFormData({
+      name: '',
+      email: '',
+      role: '',
+      avatar: ''
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    try {
+      setUpdating(true);
+      const updatedUser = await userService.updateUser(editingUser.id, {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        avatar: formData.avatar || undefined,
+        updateDate: new Date().toISOString()
+      });
+
+      // Update local state
+      setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
+      alert(`Đã cập nhật user: ${updatedUser.name}`);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      alert('Không thể cập nhật user. Vui lòng thử lại.');
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleDelete = async (user: User) => {
@@ -211,6 +272,94 @@ export default function UserManagerPage() {
           </>
         )}
       </div>
+
+      {/* Modal for editing user */}
+      {isModalOpen && editingUser && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Chỉnh sửa thông tin User</h2>
+              <button className={styles.modalCloseButton} onClick={handleCloseModal}>✕</button>
+            </div>
+            <form onSubmit={handleUpdateUser} className={styles.modalForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="name">Tên người dùng *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className={styles.formInput}
+                  placeholder="Nhập tên người dùng"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className={styles.formInput}
+                  placeholder="Nhập email"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="role">Role *</label>
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  required
+                  className={styles.formSelect}
+                >
+                  <option value="">Chọn role</option>
+                  <option value="User">User</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="avatar">Avatar URL</label>
+                <input
+                  type="url"
+                  id="avatar"
+                  name="avatar"
+                  value={formData.avatar}
+                  onChange={handleInputChange}
+                  className={styles.formInput}
+                  placeholder="Nhập URL avatar (tùy chọn)"
+                />
+              </div>
+
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className={styles.cancelButton}
+                  disabled={updating}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={updating}
+                >
+                  {updating ? '⏳ Đang cập nhật...' : '💾 Cập nhật'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
