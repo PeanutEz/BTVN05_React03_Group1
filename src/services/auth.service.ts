@@ -83,5 +83,10 @@ export const authService = {
     } catch {
       return null;
     }
+  },
+
+  updateCurrentUser(user: User): void {
+    const { password, ...userWithoutPassword } = user;
+    localStorage.setItem('user', JSON.stringify(userWithoutPassword));
   }
 };
