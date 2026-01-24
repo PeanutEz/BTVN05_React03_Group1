@@ -1,0 +1,15 @@
+{
+    "value":  [
+                  {
+                      "name":  "Test User",
+                      "email":  "final_test_189999@example.com",
+                      "password":  "password123",
+                      "createDate":  "2026-01-23T17:31:17.984Z",
+                      "updateDate":  "2026-01-22T23:16:46.011Z",
+                      "role":  "User",
+                      "avatar":  "https://ui-avatars.com/api/?name=Test%20User\u0026background=random",
+                      "id":  "12"
+                  }
+              ],
+    "Count":  1
+}
