@@ -43,12 +43,10 @@ export default function ProfilePage() {
       // Get current user
       const currentUser = authService.getCurrentUser();
       setUser(currentUser);
-      
-      if (currentUser) {
-        // Fetch user's posts
-        const response = await postService.getPosts(1, 100); // Get all posts
-        const filteredPosts = response.posts.filter((post: Post) => post.userName === currentUser.name);
-        setUserPosts(filteredPosts);
+        if (currentUser) {
+        // Fetch user's posts by userId using new API function
+        const response = await postService.getPostsByUserId(currentUser.id);
+        setUserPosts(response.posts);
       }
 
     } catch (error) {
