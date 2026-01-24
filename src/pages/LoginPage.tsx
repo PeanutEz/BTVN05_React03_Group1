@@ -18,7 +18,7 @@ export default function LoginPage() {
 
     try {
       const response = await authService.login({ email, password });
-      
+
       // Redirect dựa vào role
       if (response.user.role === 'Admin') {
         navigate('/admin/users');
@@ -42,7 +42,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {error && <div className={styles.error}>{error}</div>}
-          
+
           <div className={styles.inputGroup}>
             <input
               type="email"
@@ -67,8 +67,8 @@ export default function LoginPage() {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className={`${styles.submitButton} ${loading ? styles.loading : ''}`}
           >
@@ -91,7 +91,13 @@ export default function LoginPage() {
 
         <div className={styles.footer}>
           Chưa có tài khoản? {' '}
-          <a href="#" className={styles.footerLink}>Đăng ký ngay</a>
+          <span
+            className={styles.footerLink}
+            onClick={() => navigate('/register')}
+            style={{ cursor: 'pointer' }}
+          >
+            Đăng ký ngay
+          </span>
         </div>
       </div>
     </div>
