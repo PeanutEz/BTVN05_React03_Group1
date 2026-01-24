@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { authService } from '../services/auth.service';
 import { postService } from '../services/post.service';
+import { userService } from '../services/user.service';
 import type { User } from '../types/user.type';
 import type { Post } from '../types/post.type';
 import styles from './ProfilePage.module.css';
@@ -24,9 +26,11 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -38,7 +42,9 @@ export default function ProfilePage() {
       
       // Get current user
       const currentUser = authService.getCurrentUser();
-      setUser(currentUser);      if (currentUser) {
+      setUser(currentUser);
+      
+      if (currentUser) {
         // Fetch user's posts
         const response = await postService.getPosts(1, 100); // Get all posts
         const filteredPosts = response.posts.filter((post: Post) => post.userName === currentUser.name);
@@ -49,6 +55,30 @@ export default function ProfilePage() {
       console.error('Failed to fetch user data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+
+    const confirmed = window.confirm(
+      `Bạn có chắc chắn muốn xóa tài khoản "${user.name}"?\n\nHành động này không thể hoàn tác!`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsDeleting(true);
+      await userService.deleteUser(user.id);
+      
+      // Logout and redirect to login
+      authService.logout();
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      alert('Không thể xóa tài khoản. Vui lòng thử lại.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -132,6 +162,20 @@ export default function ProfilePage() {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
+              <button className={styles.editButton}>
+                ✏️ Chỉnh sửa hồ sơ
+              </button>
+              <button 
+                className={styles.editButton}
+                style={{ backgroundColor: '#dc3545' }}
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+              >
+                {isDeleting ? '⏳ Đang xóa...' : '🗑️ Xóa tài khoản'}
+              </button>
             </div>
 
             <button className={styles.editButton}>
