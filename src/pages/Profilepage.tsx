@@ -31,6 +31,13 @@ export default function ProfilePage() {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    avatar: ''
+  });
 
   useEffect(() => {
     fetchUserData();
@@ -77,6 +84,61 @@ export default function ProfilePage() {
       alert('Không thể xóa tài khoản. Vui lòng thử lại.');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleEditProfile = () => {
+    if (!user) return;
+    
+    setFormData({
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      name: '',
+      email: '',
+      avatar: ''
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    try {
+      setIsUpdating(true);
+      const updatedUser = await userService.updateUser(user.id, {
+        name: formData.name,
+        email: formData.email,
+        avatar: formData.avatar || undefined,
+        updateDate: new Date().toISOString()
+      });
+
+      // Update local state and localStorage
+      setUser(updatedUser);
+      authService.updateCurrentUser(updatedUser);
+      
+      alert('Cập nhật hồ sơ thành công!');
+      handleCloseModal();
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert('Không thể cập nhật hồ sơ. Vui lòng thử lại.');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -163,7 +225,10 @@ export default function ProfilePage() {
             </div>
 
             <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
-              <button className={styles.editButton}>
+              <button 
+                className={styles.editButton}
+                onClick={handleEditProfile}
+              >
                 ✏️ Chỉnh sửa hồ sơ
               </button>
               <button 
@@ -175,10 +240,6 @@ export default function ProfilePage() {
                 {isDeleting ? '⏳ Đang xóa...' : '🗑️ Xóa tài khoản'}
               </button>
             </div>
-
-            <button className={styles.editButton}>
-              ✏️ Chỉnh sửa hồ sơ
-            </button>
           </div>
         </aside>
 
@@ -252,6 +313,89 @@ export default function ProfilePage() {
           )}
         </main>
       </div>
+
+      {/* Modal for editing profile */}
+      {isModalOpen && user && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>✏️ Chỉnh sửa hồ sơ</h2>
+              <button className={styles.modalCloseButton} onClick={handleCloseModal}>✕</button>
+            </div>
+            <form onSubmit={handleUpdateProfile} className={styles.modalForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="name">Tên hiển thị *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className={styles.formInput}
+                  placeholder="Nhập tên của bạn"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className={styles.formInput}
+                  placeholder="Nhập email của bạn"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="avatar">Avatar URL</label>
+                <input
+                  type="url"
+                  id="avatar"
+                  name="avatar"
+                  value={formData.avatar}
+                  onChange={handleInputChange}
+                  className={styles.formInput}
+                  placeholder="Nhập URL avatar (tùy chọn)"
+                />
+                {formData.avatar && (
+                  <div className={styles.avatarPreview}>
+                    <img 
+                      src={formData.avatar} 
+                      alt="Avatar preview" 
+                      onError={(e) => {
+                        e.currentTarget.src = generateAvatarUrl(formData.name);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className={styles.cancelButton}
+                  disabled={isUpdating}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? '⏳ Đang cập nhật...' : '💾 Lưu thay đổi'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
