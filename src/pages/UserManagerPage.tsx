@@ -29,6 +29,7 @@ export default function UserManagerPage() {
   const [error, setError] = useState('');
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const normalizeText = (text: string) =>
     text
       .toLowerCase()
@@ -67,9 +68,21 @@ export default function UserManagerPage() {
     alert(`Chỉnh sửa user: ${user.name}`);
   };
 
-  const handleDelete = (user: User) => {
+  const handleDelete = async (user: User) => {
     if (confirm(`Bạn có chắc muốn xóa user ${user.name}?`)) {
-      alert(`Đã xóa user: ${user.name}`);
+      try {
+        setDeletingId(user.id);
+        await userService.deleteUser(user.id);
+        
+        // Remove user from local state
+        setUsers(users.filter(u => u.id !== user.id));
+        alert(`Đã xóa user: ${user.name}`);
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+        alert('Không thể xóa user. Vui lòng thử lại.');
+      } finally {
+        setDeletingId(null);
+      }
     }
   };
 
@@ -187,8 +200,9 @@ export default function UserManagerPage() {
                       <button
                         onClick={() => handleDelete(user)}
                         className={`${styles.actionButton} ${styles.deleteButton}`}
+                        disabled={deletingId === user.id}
                       >
-                        🗑️ Delete
+                        {deletingId === user.id ? '⏳ Đang xóa...' : '🗑️ Delete'}
                       </button>
                     </div>
                   </div>))
