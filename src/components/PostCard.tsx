@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import type { Post } from '../types/post.type';
+<<<<<<< HEAD
 import type { User } from '../types/user.type';
+=======
+import { authService } from '../services/auth.service';
+import DeletePostButton from './DeletePostButton';
+>>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
 import styles from './PostCard.module.css';
 import EditPostModal from './EditPostModal';
 
@@ -35,6 +40,7 @@ const generateAvatarUrl = (name: string) => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00d084&color=fff&size=56`;
 };
 
+<<<<<<< HEAD
 export default function PostCard({ post, currentUser, onPostUpdate }: PostCardProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const isOwner = currentUser && parseInt(currentUser.id) === post.userId;
@@ -44,6 +50,17 @@ export default function PostCard({ post, currentUser, onPostUpdate }: PostCardPr
       onPostUpdate(updatedPost);
     }
   };
+=======
+export default function PostCard({ post }: PostCardProps) {
+  const currentUser = authService.getCurrentUser();
+  // Chỉ hiển thị nút xóa khi:
+  // 1. User đang đăng nhập (không phải admin)
+  // 2. Bài viết thuộc về user đó (post.userId === currentUser.id)
+  const canDelete = 
+    currentUser && 
+    currentUser.role !== 'Admin' && 
+    post.userId === parseInt(currentUser.id, 10);
+>>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
 
   return (
     <>
@@ -135,6 +152,9 @@ export default function PostCard({ post, currentUser, onPostUpdate }: PostCardPr
             Chia sẻ
           </button>
         </div>
+
+        {/* Delete button - chỉ hiển thị khi user là chủ sở hữu bài viết */}
+        {canDelete && <DeletePostButton postId={post.id} />}
       </div>
       </div>
 

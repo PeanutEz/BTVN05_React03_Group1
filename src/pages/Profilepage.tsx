@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { usePostsRefresh } from '../contexts/PostsContext';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import EditPostModal from '../components/EditPostModal';
+import AddPostForm from '../components/AddPostForm';
 import { authService } from '../services/auth.service';
 import { postService } from '../services/post.service';
 import { userService } from '../services/user.service';
@@ -27,6 +29,7 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function ProfilePage() {
+  const { refreshKey } = usePostsRefresh();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
@@ -43,7 +46,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     fetchUserData();
-  }, []);
+  }, [refreshKey]);
 
   const fetchUserData = async () => {
     try {
@@ -269,6 +272,8 @@ export default function ProfilePage() {
             <h2>📝 Bài viết của tôi</h2>
             <span className={styles.postCount}>{userPosts.length} bài viết</span>
           </div>
+
+          <AddPostForm />
 
           {userPosts.length > 0 ? (
             <div className={styles.postsList}>

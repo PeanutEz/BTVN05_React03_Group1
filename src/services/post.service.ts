@@ -1,8 +1,7 @@
+import api from './api';
 import type { Post } from '../types/post.type';
 import api from './api';
 
-// Mock data - trong thực tế sẽ fetch từ API
-import postsData from '../data/posts.example.json';
 
 export interface PostResponse {
   posts: Post[];
@@ -10,70 +9,77 @@ export interface PostResponse {
   hasMore: boolean;
 }
 
+<<<<<<< HEAD
 export interface UpdatePostRequest {
   title: string;
   description: string;
   type: 'image' | 'video';
   url: string;
 }
+=======
+export type CreatePostRequest = Omit<Post, 'id'>;
+
+>>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
 
 export const postService = {
-  // Lấy posts với pagination và search
-  async getPosts(page: number = 1, limit: number = 5, searchTerm: string = ''): Promise<PostResponse> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Filter only active posts
-    let activePosts = (postsData as Post[])
-      .filter(post => post.status === 'active');
-    
-    // Search by title if searchTerm is provided
+  // Lấy posts với pagination và search (CALL API thật)
+async getPosts(page: number = 1, limit: number = 5, searchTerm: string = ''): Promise<PostResponse> {
+  try {
+    // Lấy toàn bộ posts từ API rồi filter/sort/paginate phía client để tránh phụ thuộc query params backend
+    const response = await api.get<Post[]>('/posts');
+    let activePosts = response.data.filter((p) => p.status === 'active');
+
     if (searchTerm.trim()) {
-      activePosts = activePosts.filter(post => 
-        post.title.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const q = searchTerm.toLowerCase();
+      activePosts = activePosts.filter((p) => p.title.toLowerCase().includes(q));
     }
-    
-    // Sort by createDate (newest first)
-    activePosts = activePosts.sort((a, b) => 
-      new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
+
+    activePosts = activePosts.sort(
+      (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
     );
-    
+
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const posts = activePosts.slice(startIndex, endIndex);
-      return {
+
+    return {
       posts,
       total: activePosts.length,
-      hasMore: endIndex < activePosts.length
+      hasMore: endIndex < activePosts.length,
     };
-  },
-  // Lấy posts của một user cụ thể theo userId (simulating ?userId=...)
-  async getPostsByUserId(userId: string | number, page: number = 1, limit: number = 100): Promise<PostResponse> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Convert userId to number for comparison
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Không thể lấy danh sách bài viết';
+    throw new Error(message);
+  }
+},
+
+  // Lấy posts của một user cụ thể theo userId (CALL API thật)
+async getPostsByUserId(userId: string | number, page: number = 1, limit: number = 100): Promise<PostResponse> {
+  try {
     const userIdNum = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-    
-    // Filter posts by userId and active status
-    let userPosts = (postsData as Post[])
-      .filter(post => post.status === 'active' && post.userId === userIdNum);
-    
-    // Sort by createDate (newest first)
-    userPosts = userPosts.sort((a, b) => 
-      new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
+
+    const response = await api.get<Post[]>('/posts');
+    let userPosts = response.data.filter(
+      (p) => p.status === 'active' && p.userId === userIdNum
     );
-    
+
+    userPosts = userPosts.sort(
+      (a, b) => new Date(b.createDate).getTime() - new Date(a.createDate).getTime()
+    );
+
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const posts = userPosts.slice(startIndex, endIndex);
-    
+
     return {
       posts,
       total: userPosts.length,
-      hasMore: endIndex < userPosts.length
+      hasMore: endIndex < userPosts.length,
     };
+<<<<<<< HEAD
   },
 
   // Cập nhật bài viết
@@ -90,5 +96,42 @@ export const postService = {
       console.error('Error updating post:', error);
       throw new Error('Không thể cập nhật bài viết');
     }
+=======
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Không thể lấy bài viết của người dùng';
+    throw new Error(message);
+>>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
   }
+}
+,
+// Tạo post mới (CALL API thật)
+async createPost(payload: CreatePostRequest): Promise<Post> {
+  try {
+    const response = await api.post<Post>('/posts', payload);
+    return response.data;
+  } catch (error: any) {
+    // MockAPI thường trả lỗi dạng này
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Không thể tạo bài viết';
+    throw new Error(message);
+  }
+},
+
+// Xóa post (CALL API thật)
+async deletePost(postId: number | string): Promise<void> {
+  try {
+    await api.delete(`/posts/${postId}`);
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Không thể xóa bài viết';
+    throw new Error(message);
+  }
+}
 };
