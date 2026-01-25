@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Post } from '../types/post.type';
 import { postService } from '../services/post.service';
+import { authService } from '../services/auth.service';
 import { usePostsRefresh } from '../contexts/PostsContext';
 import PostCard from './PostCard';
 import styles from './PostList.module.css';
@@ -13,6 +14,7 @@ export default function PostList() {
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentUser] = useState(() => authService.getCurrentUser());
   // Load posts function
   const loadPosts = useCallback(async (pageNumber: number, isInitial = false, search = searchTerm) => {
     if (loading) return;
@@ -46,9 +48,21 @@ export default function PostList() {
     loadPosts(1, true, term);
   }, [loadPosts]);
 
-  // Load initial posts
+  // Handle post update
+  const handlePostUpdate = useCallback((updatedPost: Post) => {
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+  }, []);
+
+  // Load initial posts when refreshKey changes
   useEffect(() => {
+    setPage(1);
+    setHasMore(true);
     loadPosts(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshKey]);
   // Infinite scroll handler
   useEffect(() => {
@@ -114,7 +128,12 @@ export default function PostList() {
         ) : (
           <>
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard 
+                key={post.id} 
+                post={post} 
+                currentUser={currentUser}
+                onPostUpdate={handlePostUpdate}
+              />
             ))}            {loading && (
               <div className={styles.loadingBox}>
                 <div className={styles.spinner}></div>
