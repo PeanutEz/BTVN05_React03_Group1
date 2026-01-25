@@ -1,4 +1,5 @@
 import type { Post } from '../types/post.type';
+import api from './api';
 
 // Mock data - trong thực tế sẽ fetch từ API
 import postsData from '../data/posts.example.json';
@@ -7,6 +8,13 @@ export interface PostResponse {
   posts: Post[];
   total: number;
   hasMore: boolean;
+}
+
+export interface UpdatePostRequest {
+  title: string;
+  description: string;
+  type: 'image' | 'video';
+  url: string;
 }
 
 export const postService = {
@@ -66,5 +74,21 @@ export const postService = {
       total: userPosts.length,
       hasMore: endIndex < userPosts.length
     };
+  },
+
+  // Cập nhật bài viết
+  async updatePost(postId: string, data: UpdatePostRequest): Promise<Post> {
+    try {
+      const updateData = {
+        ...data,
+        updateDate: new Date().toISOString()
+      };
+      
+      const response = await api.put<Post>(`/posts/${postId}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating post:', error);
+      throw new Error('Không thể cập nhật bài viết');
+    }
   }
 };

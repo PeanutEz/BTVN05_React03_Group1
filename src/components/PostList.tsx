@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Post } from '../types/post.type';
 import { postService } from '../services/post.service';
+import { authService } from '../services/auth.service';
 import PostCard from './PostCard';
 import styles from './PostList.module.css';
 
@@ -11,6 +12,7 @@ export default function PostList() {
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentUser] = useState(() => authService.getCurrentUser());
 
   // Load posts function
   const loadPosts = useCallback(async (pageNumber: number, isInitial = false, search = searchTerm) => {
@@ -44,6 +46,15 @@ export default function PostList() {
     setHasMore(true);
     loadPosts(1, true, term);
   }, [loadPosts]);
+
+  // Handle post update
+  const handlePostUpdate = useCallback((updatedPost: Post) => {
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+  }, []);
 
   // Load initial posts
   useEffect(() => {
@@ -113,7 +124,12 @@ export default function PostList() {
         ) : (
           <>
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard 
+                key={post.id} 
+                post={post} 
+                currentUser={currentUser}
+                onPostUpdate={handlePostUpdate}
+              />
             ))}            {loading && (
               <div className={styles.loadingBox}>
                 <div className={styles.spinner}></div>

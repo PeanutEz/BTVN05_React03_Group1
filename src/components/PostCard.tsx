@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import type { Post } from '../types/post.type';
+import type { User } from '../types/user.type';
 import styles from './PostCard.module.css';
+import EditPostModal from './EditPostModal';
 
 interface PostCardProps {
   post: Post;
+  currentUser: User | null;
+  onPostUpdate?: (updatedPost: Post) => void;
 }
 
 // Helper function để tính thời gian
@@ -30,35 +35,51 @@ const generateAvatarUrl = (name: string) => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00d084&color=fff&size=56`;
 };
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, currentUser, onPostUpdate }: PostCardProps) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const isOwner = currentUser && parseInt(currentUser.id) === post.userId;
+
+  const handleUpdate = (updatedPost: Post) => {
+    if (onPostUpdate) {
+      onPostUpdate(updatedPost);
+    }
+  };
+
   return (
-    <div className={styles.postCard}>
-      {/* Header với thông tin người dùng */}
-      <div className={styles.header}>
-        <img
-          src={post.avatar || generateAvatarUrl(post.userName)}
-          alt={post.userName}
-          className={styles.avatar}
-          onError={(e) => {
-            // Fallback to generated avatar if post avatar fails to load
-            e.currentTarget.src = generateAvatarUrl(post.userName);
-          }}
-        />
-        <div className={styles.userInfo}>
-          <div className={styles.userName}>
-            {post.userName}
-          </div>          <div className={styles.timeInfo}>
-            <span className={styles.timeAgo}>
-              {getTimeAgo(post.createDate)}
-            </span>
+    <>
+      <div className={styles.postCard}>
+        {/* Header với thông tin người dùng */}
+        <div className={styles.header}>
+          <img
+            src={post.avatar || generateAvatarUrl(post.userName)}
+            alt={post.userName}
+            className={styles.avatar}
+            onError={(e) => {
+              // Fallback to generated avatar if post avatar fails to load
+              e.currentTarget.src = generateAvatarUrl(post.userName);
+            }}
+          />
+          <div className={styles.userInfo}>
+            <div className={styles.userName}>
+              {post.userName}
+            </div>          <div className={styles.timeInfo}>
+              <span className={styles.timeAgo}>
+                {getTimeAgo(post.createDate)}
+              </span>
+            </div>
           </div>
+          
+          {/* More options button - chỉ hiển thị nút edit nếu là chủ bài viết */}
+          {isOwner ? (
+            <div className={styles.moreButton} onClick={() => setIsEditModalOpen(true)} title="Chỉnh sửa bài viết">
+              <span>✏️</span>
+            </div>
+          ) : (
+            <div className={styles.moreButton}>
+              <span>•••</span>
+            </div>
+          )}
         </div>
-        
-        {/* More options button */}
-        <div className={styles.moreButton}>
-          <span>•••</span>
-        </div>
-      </div>
 
       {/* Nội dung bài viết */}
       <div className={styles.content}>
@@ -115,6 +136,16 @@ export default function PostCard({ post }: PostCardProps) {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+
+      {isEditModalOpen && (
+        <EditPostModal
+          post={post}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleUpdate}
+        />
+      )}
+    </>
   );
 }
