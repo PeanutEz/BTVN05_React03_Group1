@@ -1,17 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Post } from '../types/post.type';
 import { postService } from '../services/post.service';
+import { usePostsRefresh } from '../contexts/PostsContext';
 import PostCard from './PostCard';
 import styles from './PostList.module.css';
 
 export default function PostList() {
+  const { refreshKey } = usePostsRefresh();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-
   // Load posts function
   const loadPosts = useCallback(async (pageNumber: number, isInitial = false, search = searchTerm) => {
     if (loading) return;
@@ -48,7 +49,7 @@ export default function PostList() {
   // Load initial posts
   useEffect(() => {
     loadPosts(1, true);
-  }, []);
+  }, [refreshKey]);
   // Infinite scroll handler
   useEffect(() => {
     const handleScroll = () => {
