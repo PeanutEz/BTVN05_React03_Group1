@@ -1,17 +1,14 @@
 import { useState } from 'react';
 import type { Post } from '../types/post.type';
-<<<<<<< HEAD
 import type { User } from '../types/user.type';
-=======
 import { authService } from '../services/auth.service';
 import DeletePostButton from './DeletePostButton';
->>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
 import styles from './PostCard.module.css';
 import EditPostModal from './EditPostModal';
 
 interface PostCardProps {
   post: Post;
-  currentUser: User | null;
+  currentUser?: User | null;
   onPostUpdate?: (updatedPost: Post) => void;
 }
 
@@ -40,19 +37,15 @@ const generateAvatarUrl = (name: string) => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00d084&color=fff&size=56`;
 };
 
-<<<<<<< HEAD
-export default function PostCard({ post, currentUser, onPostUpdate }: PostCardProps) {
+export default function PostCard({ post, currentUser: propCurrentUser, onPostUpdate }: PostCardProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  
+  // Sử dụng currentUser từ prop hoặc lấy từ authService
+  const currentUser = propCurrentUser ?? authService.getCurrentUser();
+  
+  // Kiểm tra xem user có phải là chủ bài viết không (cho edit)
   const isOwner = currentUser && parseInt(currentUser.id) === post.userId;
-
-  const handleUpdate = (updatedPost: Post) => {
-    if (onPostUpdate) {
-      onPostUpdate(updatedPost);
-    }
-  };
-=======
-export default function PostCard({ post }: PostCardProps) {
-  const currentUser = authService.getCurrentUser();
+  
   // Chỉ hiển thị nút xóa khi:
   // 1. User đang đăng nhập (không phải admin)
   // 2. Bài viết thuộc về user đó (post.userId === currentUser.id)
@@ -60,7 +53,12 @@ export default function PostCard({ post }: PostCardProps) {
     currentUser && 
     currentUser.role !== 'Admin' && 
     post.userId === parseInt(currentUser.id, 10);
->>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
+
+  const handleUpdate = (updatedPost: Post) => {
+    if (onPostUpdate) {
+      onPostUpdate(updatedPost);
+    }
+  };
 
   return (
     <>
