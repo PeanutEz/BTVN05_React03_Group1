@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { usePostsRefresh } from '../contexts/PostsContext';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import EditPostModal from '../components/EditPostModal';
 import AddPostForm from '../components/AddPostForm';
 import { authService } from '../services/auth.service';
 import { postService } from '../services/post.service';
@@ -36,6 +37,7 @@ export default function ProfilePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -143,6 +145,24 @@ export default function ProfilePage() {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const handleEditPost = (post: Post) => {
+    setEditingPost(post);
+  };
+
+  const handleCloseEditPostModal = () => {
+    setEditingPost(null);
+  };
+
+  const handlePostUpdate = (updatedPost: Post) => {
+    // Update the post in the list
+    setUserPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+    setEditingPost(null);
   };
 
   if (loading) {
@@ -269,9 +289,18 @@ export default function ProfilePage() {
                       <div className={styles.postAuthor}>{post.userName}</div>
                       <div className={styles.postDate}>{formatDate(post.createDate)}</div>
                     </div>
-                    <span className={`${styles.postType} ${styles[post.type]}`}>
-                      {post.type === 'image' ? '🖼️' : '🎥'} {post.type}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span className={`${styles.postType} ${styles[post.type]}`}>
+                        {post.type === 'image' ? '🖼️' : '🎥'} {post.type}
+                      </span>
+                      <button
+                        className={styles.editPostButton}
+                        onClick={() => handleEditPost(post)}
+                        title="Chỉnh sửa bài viết"
+                      >
+                        ✏️
+                      </button>
+                    </div>
                   </div>
 
                   <h3 className={styles.postTitle}>{post.title}</h3>
@@ -400,6 +429,16 @@ export default function ProfilePage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Modal for editing post */}
+      {editingPost && (
+        <EditPostModal
+          post={editingPost}
+          isOpen={!!editingPost}
+          onClose={handleCloseEditPostModal}
+          onUpdate={handlePostUpdate}
+        />
       )}
     </div>
   );

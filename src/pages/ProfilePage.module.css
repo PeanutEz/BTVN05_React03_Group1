@@ -272,6 +272,30 @@
   color: var(--tech-blue);
 }
 
+.editPostButton {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-medium);
+  background: var(--background-tertiary);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  padding: 0;
+}
+
+.editPostButton:hover {
+  background: var(--primary-green-ultra-light);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-light);
+}
+
 .postTitle {
   font-size: 18px;
   font-weight: 600;
