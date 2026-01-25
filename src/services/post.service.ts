@@ -91,5 +91,18 @@ async createPost(payload: CreatePostRequest): Promise<Post> {
       'Không thể tạo bài viết';
     throw new Error(message);
   }
+},
+
+// Xóa post (CALL API thật)
+async deletePost(postId: number | string): Promise<void> {
+  try {
+    await api.delete(`/posts/${postId}`);
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Không thể xóa bài viết';
+    throw new Error(message);
+  }
 }
 };

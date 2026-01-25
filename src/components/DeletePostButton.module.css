@@ -24,6 +24,6 @@
 .deleteButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  ` background: #dc3545;
+  background: #dc3545;
   color: white;
 }
