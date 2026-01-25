@@ -1,4 +1,6 @@
 import type { Post } from '../types/post.type';
+import { authService } from '../services/auth.service';
+import DeletePostButton from './DeletePostButton';
 import styles from './PostCard.module.css';
 
 interface PostCardProps {
@@ -31,6 +33,15 @@ const generateAvatarUrl = (name: string) => {
 };
 
 export default function PostCard({ post }: PostCardProps) {
+  const currentUser = authService.getCurrentUser();
+  // Chỉ hiển thị nút xóa khi:
+  // 1. User đang đăng nhập (không phải admin)
+  // 2. Bài viết thuộc về user đó (post.userId === currentUser.id)
+  const canDelete = 
+    currentUser && 
+    currentUser.role !== 'Admin' && 
+    post.userId === parseInt(currentUser.id, 10);
+
   return (
     <div className={styles.postCard}>
       {/* Header với thông tin người dùng */}
@@ -114,6 +125,9 @@ export default function PostCard({ post }: PostCardProps) {
             Chia sẻ
           </button>
         </div>
+
+        {/* Delete button - chỉ hiển thị khi user là chủ sở hữu bài viết */}
+        {canDelete && <DeletePostButton postId={post.id} />}
       </div>
     </div>
   );
