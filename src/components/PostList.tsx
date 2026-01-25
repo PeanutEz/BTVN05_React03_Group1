@@ -1,11 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Post } from '../types/post.type';
 import { postService } from '../services/post.service';
-<<<<<<< HEAD
 import { authService } from '../services/auth.service';
-=======
 import { usePostsRefresh } from '../contexts/PostsContext';
->>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
 import PostCard from './PostCard';
 import styles from './PostList.module.css';
 
@@ -17,11 +14,7 @@ export default function PostList() {
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-<<<<<<< HEAD
   const [currentUser] = useState(() => authService.getCurrentUser());
-
-=======
->>>>>>> ffcebe0e84611c51d67d9d18624246b57d4ff98a
   // Load posts function
   const loadPosts = useCallback(async (pageNumber: number, isInitial = false, search = searchTerm) => {
     if (loading) return;
@@ -64,9 +57,12 @@ export default function PostList() {
     );
   }, []);
 
-  // Load initial posts
+  // Load initial posts when refreshKey changes
   useEffect(() => {
+    setPage(1);
+    setHasMore(true);
     loadPosts(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshKey]);
   // Infinite scroll handler
   useEffect(() => {
