@@ -10,6 +10,7 @@ import { userService } from '../services/user.service';
 import type { User } from '../types/user.type';
 import type { Post } from '../types/post.type';
 import styles from './ProfilePage.module.css';
+import DeletePostButton from './../components/DeletePostButton';
 
 const generateAvatarUrl = (name: string) => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00d084&color=fff&size=150`;
@@ -51,11 +52,11 @@ export default function ProfilePage() {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      
+
       // Get current user
       const currentUser = authService.getCurrentUser();
       setUser(currentUser);
-        if (currentUser) {
+      if (currentUser) {
         // Fetch user's posts by userId using new API function
         const response = await postService.getPostsByUserId(currentUser.id);
         setUserPosts(response.posts);
@@ -80,7 +81,7 @@ export default function ProfilePage() {
     try {
       setIsDeleting(true);
       await userService.deleteUser(user.id);
-      
+
       // Logout and redirect to login
       authService.logout();
       navigate('/login', { replace: true });
@@ -94,7 +95,7 @@ export default function ProfilePage() {
 
   const handleEditProfile = () => {
     if (!user) return;
-    
+
     setFormData({
       name: user.name,
       email: user.email,
@@ -136,7 +137,7 @@ export default function ProfilePage() {
       // Update local state and localStorage
       setUser(updatedUser);
       authService.updateCurrentUser(updatedUser);
-      
+
       alert('Cập nhật hồ sơ thành công!');
       handleCloseModal();
     } catch (error) {
@@ -157,8 +158,8 @@ export default function ProfilePage() {
 
   const handlePostUpdate = (updatedPost: Post) => {
     // Update the post in the list
-    setUserPosts(prevPosts => 
-      prevPosts.map(post => 
+    setUserPosts(prevPosts =>
+      prevPosts.map(post =>
         post.id === updatedPost.id ? updatedPost : post
       )
     );
@@ -192,7 +193,7 @@ export default function ProfilePage() {
   return (
     <div className={styles.container}>
       <Header />
-      
+
       <div className={styles.content}>
         {/* Cột trái: Thông tin User */}
         <aside className={styles.userInfo}>
@@ -204,10 +205,10 @@ export default function ProfilePage() {
                 className={styles.avatar}
               />
             </div>
-            
+
             <h2 className={styles.userName}>{user.name}</h2>
             <p className={styles.userEmail}>{user.email}</p>
-            
+
             <div className={styles.userStats}>
               <div className={styles.statItem}>
                 <span className={styles.statNumber}>{userPosts.length}</span>
@@ -227,7 +228,7 @@ export default function ProfilePage() {
                   <div className={styles.detailValue}>{user.role}</div>
                 </div>
               </div>
-              
+
               <div className={styles.detailItem}>
                 <span className={styles.detailIcon}>📅</span>
                 <div>
@@ -235,7 +236,7 @@ export default function ProfilePage() {
                   <div className={styles.detailValue}>{formatDate(user.createDate)}</div>
                 </div>
               </div>
-              
+
               {user.updateDate && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailIcon}>🔄</span>
@@ -248,13 +249,13 @@ export default function ProfilePage() {
             </div>
 
             <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
-              <button 
+              <button
                 className={styles.editButton}
                 onClick={handleEditProfile}
               >
                 ✏️ Chỉnh sửa hồ sơ
               </button>
-              <button 
+              <button
                 className={styles.editButton}
                 style={{ backgroundColor: '#dc3545' }}
                 onClick={handleDeleteAccount}
@@ -309,15 +310,15 @@ export default function ProfilePage() {
                   {post.url && (
                     <div className={styles.postMedia}>
                       {post.type === 'image' ? (
-                        <img 
-                          src={post.url} 
-                          alt={post.title} 
+                        <img
+                          src={post.url}
+                          alt={post.title}
                           className={styles.mediaImage}
                         />
                       ) : (
-                        <video 
-                          src={post.url} 
-                          controls 
+                        <video
+                          src={post.url}
+                          controls
                           className={styles.mediaVideo}
                         />
                       )}
@@ -334,6 +335,9 @@ export default function ProfilePage() {
                     <button className={styles.actionButton}>
                       🔗 Chia sẻ
                     </button>
+                    <div>
+                      {<DeletePostButton postId={post.id} />}
+                    </div>
                   </div>
                 </article>
               ))}
@@ -398,9 +402,9 @@ export default function ProfilePage() {
                 />
                 {formData.avatar && (
                   <div className={styles.avatarPreview}>
-                    <img 
-                      src={formData.avatar} 
-                      alt="Avatar preview" 
+                    <img
+                      src={formData.avatar}
+                      alt="Avatar preview"
                       onError={(e) => {
                         e.currentTarget.src = generateAvatarUrl(formData.name);
                       }}
